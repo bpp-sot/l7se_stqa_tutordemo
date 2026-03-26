@@ -1,0 +1,44 @@
+name: Playwright API Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # ✅ Install Node on the GitHub runner
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+
+      # ✅ Create a package.json AUTOMATICALLY
+      - name: Create package.json
+        run: |
+          cat > package.json << 'EOF'
+          {
+            "name": "ci-playwright-tests",
+            "version": "1.0.0",
+            "devDependencies": {
+              "@playwright/test": "^1.40.0"
+            }
+          }
+          EOF
+
+      # ✅ Install dependencies (Playwright itself)
+      - name: Install Playwright
+        run: npm install
+
+      # ✅ Install Playwright browsers
+      - name: Install Browsers
+        run: npx playwright install --with-deps
+
+      # ✅ Run your tests
+      - name: Run Playwright Tests
+        run: npx playwright test
